@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TeamMember {
+  id              Int               @id @default(autoincrement())
+  firstName       String            @map("first_name")
+  lastName        String            @map("last_name")
+  title           String
+  department      String    @map("department")
+  @@index([department])
+  status          String
+  startDate       DateTime          @map("start_date")
+  email           String            @unique
+  slackHandle     String?           @map("slack_handle")
+  profileImageUrl String?           @map("profile_image_url")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  skills          TeamMemberSkill[]
+
+  @@map("team_members")
+}
+
+model Skill {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  teamMembers TeamMemberSkill[]
+
+  @@map("skills")
+}
+
+model TeamMemberSkill {
+  teamMember    TeamMember @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+  teamMemberId  Int        @map("team_member_id")
+  skill         Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  skillId       Int        @map("skill_id")
+
+  @@id([teamMemberId, skillId])
+  @@map("team_member_skills")
+}
