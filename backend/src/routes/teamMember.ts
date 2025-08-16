@@ -160,6 +160,7 @@ router.patch('/:id', async (req, res, next) => {
         ...(email && { email }),
         ...(department && { department }),
         ...(status && { status }),
+        ...(title && { title }),
         ...(skills.length > 0 && {
           skills: {
             deleteMany: {},
