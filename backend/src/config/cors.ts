@@ -26,7 +26,7 @@ export const validateDomain = (domain: string): boolean => {
     return ['http:', 'https:'].includes(url.protocol) && 
            url.hostname.length > 0 &&
            !url.hostname.includes(' ') &&
-           domain === url.origin + (url.port ? `:${url.port}` : '');
+           domain === url.origin;
   } catch {
     return false;
   }

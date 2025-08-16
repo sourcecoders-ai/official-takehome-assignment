@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-
+import * as dotenv from 'dotenv';
+        dotenv.config();
 const prisma = new PrismaClient();
 
 async function seed() {
@@ -23,10 +24,13 @@ async function seed() {
   const teamMembers = await Promise.all([
     prisma.teamMember.create({
       data: {
-        name: 'John Doe',
+        firstName: 'John',
+        lastName: 'Doe',
         email: 'john@example.com',
         department: 'Engineering',
         status: 'Active',
+        title: 'John Doe Title',
+        startDate: '2025-01-01T12:00:00',
         skills: {
           create: [
             { skill: { connect: { id: skills[0].id } } }, // JavaScript
@@ -40,10 +44,13 @@ async function seed() {
     }),
     prisma.teamMember.create({
       data: {
-        name: 'Jane Smith',
+        firstName: 'Jane',
+        lastName: 'Smith',
         email: 'jane@example.com',
         department: 'Engineering',
         status: 'Active',
+        title: 'Jane Smith Title',
+        startDate: '2025-02-02T12:00:00',
         skills: {
           create: [
             { skill: { connect: { id: skills[1].id } } }, // TypeScript

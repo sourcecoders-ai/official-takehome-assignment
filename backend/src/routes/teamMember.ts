@@ -24,7 +24,7 @@ router.get('/', teamMemberLimiter, async (req, res, next) => {
       skillIds = skills.split(',').map(Number);
     }
 
-    const teamMembers = await prisma.teamMember.findMany({
+    const teamMembersRaw = await prisma.teamMember.findMany({
       where: {
         ...(department && { department: { equals: String(department), mode: 'insensitive' } }),
         ...(status && { status: String(status) }),
@@ -47,6 +47,14 @@ router.get('/', teamMemberLimiter, async (req, res, next) => {
         lastName: 'asc'
       }
     });
+
+    // Filter to only those who have all skillIds
+    const teamMembers = skillIds.length > 0
+      ? teamMembersRaw.filter(tm => {
+          const memberSkillIds = tm.skills.map(s => s.skillId);
+          return skillIds.every(id => memberSkillIds.includes(id));
+        })
+      : teamMembersRaw;
 
     console.log('Found team members:', teamMembers);
 
