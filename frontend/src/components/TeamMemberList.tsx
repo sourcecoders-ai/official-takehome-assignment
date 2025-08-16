@@ -11,13 +11,12 @@ import {
   ModalHeader, 
   ModalCloseButton, 
   ModalBody, 
-  ModalFooter,
   useDisclosure,
   Flex,
   Tag,
   Input,
   Select,
-  HStack
+  TagCloseButton
 } from '@chakra-ui/react';
 import { TeamMember } from '../types';
 import { teamMemberService } from '../services/api';
@@ -264,7 +263,7 @@ const TeamMemberList: React.FC<TeamMemberListProps> = ({ teamMembers, onRefresh 
                     borderRadius="full"
                     px={3}
                   >
-                    {skill.skill.name}
+                    {skill.name}
                   </Tag>
                 ))}
               </Flex>

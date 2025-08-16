@@ -12,6 +12,7 @@ export interface TeamMember {
   department: string;
   status: string;
   title: string;
+  startDate: string;
 }
 
 export interface CreateTeamMemberDto {

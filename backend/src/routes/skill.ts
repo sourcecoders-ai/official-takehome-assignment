@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AppError } from '../middleware/errorHandler';
 
@@ -29,6 +29,10 @@ router.post('/', async (req, res, next) => {
     const trimmedName = name.trim();
     
     // Try to find or create the skill
+    const existingSkill = await prisma.skill.findUnique({
+      where: { name: trimmedName }
+    });
+
     const skill = await prisma.skill.upsert({
       where: { name: trimmedName },
       update: {}, // No updates if exists

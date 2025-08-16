@@ -1,75 +1,19 @@
-import axios from 'axios';
+import Axios, {  AxiosRequestConfig,  } from 'axios';
+import { setupCache } from 'axios-cache-interceptor';
 import { TeamMember, CreateTeamMemberDto, Skill } from '../types';
 
 // Cache and request deduplication storage
-const cache = new Map<string, { data: any, timestamp: number }>();
-const pendingRequests = new Map<string, Promise<any>>();
-const CACHE_DURATION = 60 * 1000; // 1 minute cache
 
-const apiClient = axios.create({
-  baseURL: '/api',
+
+const instance = Axios.create({
+  baseURL: 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 10000, // 10 seconds
-  retry: 3, // Retry failed requests up to 3 times
-  retryDelay: 1000 // Wait 1 second between retries
+  timeout: 10000 // 10 seconds
 });
+const apiClient = setupCache(instance);
 
-// Add caching interceptor
-apiClient.interceptors.request.use(config => {
-  if (config.method?.toLowerCase() === 'get') {
-    const cacheKey = JSON.stringify({
-      url: config.url,
-      params: config.params
-    });
-    
-    // Check cache
-    const cached = cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('Serving from cache:', cacheKey);
-      return {
-        ...config,
-        adapter: () => Promise.resolve({
-          data: cached.data,
-          status: 200,
-          statusText: 'OK',
-          headers: {},
-          config
-        })
-      };
-    }
-
-    // Check for pending requests
-    if (pendingRequests.has(cacheKey)) {
-      console.log('Deduplicating request:', cacheKey);
-      return {
-        ...config,
-        adapter: () => pendingRequests.get(cacheKey)
-      };
-    }
-
-    // Store the pending request
-    const requestPromise = apiClient(config)
-      .finally(() => pendingRequests.delete(cacheKey));
-    pendingRequests.set(cacheKey, requestPromise);
-  }
-  return config;
-});
-
-apiClient.interceptors.response.use(response => {
-  if (response.config.method?.toLowerCase() === 'get') {
-    const cacheKey = JSON.stringify({
-      url: response.config.url,
-      params: response.config.params
-    });
-    cache.set(cacheKey, {
-      data: response.data,
-      timestamp: Date.now()
-    });
-  }
-  return response;
-});
 
 // Add retry interceptor
 apiClient.interceptors.response.use(undefined, (error) => {
@@ -149,11 +93,12 @@ export const teamMemberService = {
     try {
       const response = await apiClient.get('/team-members', {
         params,
+        cache: false,
         ...config
       });
       return response.data;
     } catch (error) {
-      if (axios.isCancel(error)) {
+      if (Axios.isCancel(error)) {
         console.log('Request canceled', error.message);
         throw error;
       }

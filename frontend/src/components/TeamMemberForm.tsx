@@ -84,6 +84,7 @@ const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
         department,
         status,
         startDate,
+        title,
         skillIds: skills.map(skill => skill.id)
       };
 
