@@ -9,6 +9,8 @@ import { skillRouter } from './routes/skill';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
+app.use(cors());
+app.options('*', cors()) // include before other routes
 export const prisma = new PrismaClient();
 
 // Enhanced debug routes with error handling
