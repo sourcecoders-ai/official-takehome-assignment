@@ -1,9 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AppError } from '../middleware/errorHandler';
+import cors from 'cors';
 
 const router = express.Router();
 const prisma = new PrismaClient();
+router.use(cors());
 
 // GET /api/skills
 router.get('/', async (req, res, next) => {

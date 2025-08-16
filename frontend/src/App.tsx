@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   ChakraProvider, 
   Container, 
@@ -18,19 +18,25 @@ const App: React.FC = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isAddingMember, setIsAddingMember] = useState(false);
 
-  const fetchTeamMembers = async () => {
-    try {
-      console.log('Fetching team members...');
-      const members = await teamMemberService.getAll();
-      console.log('Fetched team members:', members);
-      setTeamMembers(members);
-    } catch (error) {
-      console.error('Failed to fetch team members:', error);
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-      }
+  const fetchTeamMembers = useCallback(async (filtered_members?: TeamMember[]|undefined
+) => {
+    if (filtered_members) {
+      setTeamMembers(filtered_members);
+      return
     }
-  };
+      try {
+        console.log('Fetching team members...');
+        const members = await teamMemberService.getAll();
+        console.log('Fetched team members:', members);
+        setTeamMembers(members);
+      } catch (error: any) {
+        console.error('Failed to fetch team members:', error);
+        if (error?.response) {
+          console.error('Error response:', error.response.data);
+        }
+      }
+    },
+  [setTeamMembers]);
 
   useEffect(() => {
     fetchTeamMembers();
